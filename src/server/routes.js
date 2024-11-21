@@ -1,12 +1,14 @@
 import { Router } from 'express';
-// import config from './config';
+import { health_check } from './handlers/health_check.js';
+import { register } from './handlers/auth.js';
 
 const routes = Router();
 
-// routes.route()
+//  INFO: Health Check
+routes.get('/health_check', health_check);
 
-routes.get('/health_check', (_, res) => {
-    res.status(200).send('OK');
-})
+//  INFO: Auth
+routes.post('/register', register);
+
 
 export default routes;
