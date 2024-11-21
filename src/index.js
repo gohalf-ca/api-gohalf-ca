@@ -1,6 +1,6 @@
 import config from './lib/config.js';
 import app from './app.js';
-// import connectToDb from './database.js';
+import { connect_to_db } from './lib/database.js';
 
 const exitHandler = () => {
     if (server) {
@@ -17,14 +17,7 @@ let server = null;
 
 (async () => {
     try {
-        // const db = await connectToDb();
-
-        // const { ok } = await db.command({ ping: 1 });
-        // if (ok === 1) {
-        //     console.log('Connected to the database');
-        // } else {
-        //     throw new Error('Failed to connect to the database');
-        // }
+        await connect_to_db();
 
         server = app.listen(config.port ?? 3000, () => {
             console.log(`Listening to port ${config.port}`)
