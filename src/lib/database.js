@@ -1,4 +1,9 @@
+import postgres from 'postgres';
 import config from './config.js';
+
+if (!config.db.url) {
+    throw new Error('Missing DATABASE_URL in .env file');
+}
 
 let db = null;
 
@@ -8,11 +13,7 @@ const connectToDb = async () => {
     }
 
     try {
-        // const client = new MongoClient(config.db.url);
-        //
-        // await client.connect();
-        //
-        // db = client.db(config.db.name);
+        db = postgres(config.db.url)
 
         // Defer (clean up) the connection when the process is terminated.
         process.on('SIGINT', async () => {
