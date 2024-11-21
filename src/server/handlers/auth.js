@@ -1,4 +1,4 @@
-import { connect_to_db } from '../../lib/database.js';
+import { connect_to_db } from '../../database/database.js';
 import { hash } from 'bcrypt'
 
 /** register

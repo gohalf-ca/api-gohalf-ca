@@ -1,6 +1,6 @@
 import config from './lib/config.js';
 import app from './app.js';
-import { connect_to_db } from './lib/database.js';
+import { connect_to_db } from './database/database.js';
 
 const exitHandler = () => {
     if (server) {
