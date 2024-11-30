@@ -11,6 +11,10 @@ if (parsed) {
 }
 
 export default {
+    clerk: {
+        signing_secret: process.env.CLERK_SIGNING_SECRET,
+        secret_key: process.env.CLERK_SECRET_KEY
+    },
     port: process.env.APP_PORT,
     db: {
         url: process.env.DATABASE_URL,

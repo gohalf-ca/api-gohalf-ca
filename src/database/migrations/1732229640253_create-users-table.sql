@@ -2,9 +2,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     email TEXT NOT NULL UNIQUE CHECK (email <> ''),
-    name TEXT,
-    username TEXT UNIQUE,
-    password TEXT,
+    clerk_id TEXT NOT NULL UNIQUE CHECK (clerk_id <> ''),
     is_admin BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
