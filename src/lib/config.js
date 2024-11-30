@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 const { error, parsed } = dotenv.config();
 
 if (error) {
-    throw new Error('Failed to load .env file');
+    console.error('Failed to load .env file');
 }
 
 if (parsed) {
