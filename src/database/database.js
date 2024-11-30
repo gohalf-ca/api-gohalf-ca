@@ -1,5 +1,5 @@
 import pg from 'pg';
-import config from './config.js';
+import config from '../lib/config.js'
 
 if (!config.db.url) {
     throw new Error('Missing DATABASE_URL in .env file');
