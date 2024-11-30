@@ -1,6 +1,6 @@
 -- Up Migration
 CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
+    user_id SERIAL PRIMARY KEY,
     email TEXT NOT NULL UNIQUE CHECK (email <> ''),
     clerk_id TEXT NOT NULL UNIQUE CHECK (clerk_id <> ''),
     is_admin BOOLEAN NOT NULL DEFAULT false,
