@@ -1,4 +1,4 @@
-import { reset } from 'nodemon';
+//import { reset } from 'nodemon';
 import { connect_to_db } from '../../database/database.js';
 
 /** create user
