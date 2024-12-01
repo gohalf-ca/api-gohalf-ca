@@ -2,7 +2,7 @@
 import { Webhook } from 'svix';
 // import { connect_to_db } from '../../database/database.js';
 import config from '../../lib/config.js';
-import { create_user } from '../services/user.js';
+import { create_user } from '../services/users.js';
 
 /** webhook
  * @param {import('express').Request} req - The Express request object.

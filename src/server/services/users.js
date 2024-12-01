@@ -7,15 +7,12 @@ import { connect_to_db } from '../../database/database.js';
 */
 export const create_user = async (clerk_id, email) => {
     const db = await connect_to_db();
-
     try {
         const sql = `
             INSERT INTO users (clerk_id, email)
             VALUES ($1, $2);
         `;
-        const result = await db.query(sql, [clerk_id, email]);
-        console.log("User created", result);
-        return result;
+        void db.query(sql, [clerk_id, email]);
     } catch (err) {
         console.error("Failed to create user", err.message);
         return null;
