@@ -8,8 +8,8 @@ import * as trip_service from '../services/trips.js'
  */
 export const create_trip = async (req, res) => {
     try {
-        await trip_service.create_trip(req.body.owner_id, req.body.name, req.body.description);
-        res.status(201).json({ message: 'Trip created' });
+        let result = await trip_service.create_trip(req.body.owner_id, req.body.name, req.body.description);
+        res.status(201).json({ message: 'Trip created', trip_id:  result});
     } catch (err) {
         res.status(500).json({ error: 'Failed to create trip', message: err.message });
     }
@@ -57,5 +57,18 @@ export const delete_trip = async (req, res) => {
         res.status(201).json({ message: 'Trip deleted' });
     } catch (err) {
         res.status(500).json({ error: 'Failed to delete trip', message: err.message });
+    }
+}
+
+
+
+
+export const getalltrips = async(req, res) => {
+    try{
+        const { clerk_id } = req.params;
+        const responseData = await trip_service.getalltrips(clerk_id);
+        res.status(201).json({response: true, data: responseData});
+    }catch(err){
+        res.send(500).json({error: 'Failed to delete trip', message: err.message})
     }
 }

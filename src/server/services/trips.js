@@ -13,9 +13,11 @@ export const create_trip = async (owner_id, trip_name, trip_desc) => {
         const code = Math.random().toString(36).substring(2, 8);
         const sql = `
             INSERT INTO trips (owner_id, name, description, code)
-            VALUES ($1, $2, $3, $4);
+            VALUES ($1, $2, $3, $4)
+            RETURNING trip_id;
         `;
-        void db.query(sql, [owner_id, trip_name, trip_desc, code]);
+        const result = await db.query(sql, [owner_id, trip_name, trip_desc, code]);
+        return result.rows[0].trip_id;
     } catch (err) {
         console.error("Failed to create ", err.message);
         return err;
@@ -79,6 +81,27 @@ export const delete_trip = async (trip_id) => {
         void db.query(sql, [trip_id]);
     } catch (err) {
         console.error("Failed to delete trip", err.message);
+        return err;
+    }
+}
+
+
+
+//getting all trips of user
+export const getalltrips = async (clerk_id) => {
+    try{
+        const db = await connect_to_db();
+        const sql = `
+            select t.* from trips t
+            join users u
+            on owner_id = user_id
+            where u.clerk_id = $1;
+        `;
+        const result = await db.query(sql, [clerk_id]);
+        return result.rows;
+
+    }catch(err){
+        console.log(err);
         return err;
     }
 }
