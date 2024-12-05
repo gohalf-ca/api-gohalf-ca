@@ -1,8 +1,9 @@
-
+import 'dotenv/config';
 import { Webhook } from 'svix';
 // import { connect_to_db } from '../../database/database.js';
 import config from '../../lib/config.js';
 import { create_user } from '../services/users.js';
+import { clerkClient } from '@clerk/express';
 
 /** webhook
  * @param {import('express').Request} req - The Express request object.
@@ -11,8 +12,6 @@ import { create_user } from '../services/users.js';
  * @returns {void} - No return value.
 */
 export const clerk_webhook = async (req, res) => {
-    // const db = await connect_to_db();
-
     // Create new Svix instance with secret
     const wh = new Webhook(config.clerk.signing_secret)
 
@@ -60,7 +59,14 @@ export const clerk_webhook = async (req, res) => {
         if (email_addresses.length > 0) {
             const email = email_addresses[0].email_address;
             if (id && email) {
-                void create_user(id, email);
+                try {
+                    const result = await create_user(id, email);
+                    if (result.user_id && result.clerk_id) {
+                        void clerkClient.users.updateUser(result.clerk_id, { externalId: String(result.user_id) });
+                    }
+                } catch (err) {
+                    console.log("Error: ", err);
+                }
             }
         }
     }

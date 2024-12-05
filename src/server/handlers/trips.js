@@ -15,6 +15,21 @@ export const create_trip = async (req, res) => {
     }
 }
 
+/** get trip by `code` 
+ * @param {import('express').Request} req - The Express request object.
+ * @param {import('express').Response} res - The Express response object.
+ * @param {import('express').NextFunction} next - The Express next middleware function.
+ * @returns {void} - No return value.
+ */
+export const get_trip_by_code = async (req, res) => {
+    try {
+        const trip = await trip_service.get_trip_by_code(req.params.code);
+        res.status(201).json(trip);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to get trip', message: err.message });
+    }
+}
+
 /** get trip by `trip_id` 
  * @param {import('express').Request} req - The Express request object.
  * @param {import('express').Response} res - The Express response object.
@@ -60,9 +75,6 @@ export const delete_trip = async (req, res) => {
     }
 }
 
-
-
-
 export const getalltrips = async (req, res) => {
     try {
         const { clerk_id } = req.params;
@@ -70,5 +82,31 @@ export const getalltrips = async (req, res) => {
         res.status(201).json({ response: true, data: responseData });
     } catch (err) {
         res.send(500).json({ error: 'Failed to delete trip', message: err.message })
+    }
+}
+
+/** join a trip by code
+ * @param {import('express').Request} req - The Express request object.
+ * @param {import('express').Response} res - The Express response object.
+ * @param {import('express').NextFunction} next - The Express next middleware function.
+ * @returns {void} - No return value.
+ */
+export const join_trip = async (req, res) => {
+    const user_id = req.auth.sessionClaims.user_external_id;
+    const { code } = req.params;
+    if (!code) {
+        res.status(400).json({ error: 'Code is required' });
+        return
+    }
+    try {
+        const trip = await trip_service.get_trip_by_code(code);
+        if (!trip) {
+            res.status(404).json({ error: 'Trip not found' });
+            return;
+        }
+        const result = await trip_service.join_trip(trip.trip_id, user_id);
+        res.status(201).json({ message: 'Trip joined', result });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 }

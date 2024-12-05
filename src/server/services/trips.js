@@ -25,6 +25,24 @@ export const create_trip = async (owner_id, trip_name, trip_desc) => {
 }
 
 /** get trip
+ * @param {string} trip_code - The code of the trip.
+ * @returns {Promise<import('pg').QueryResult.rows>} - The result of the query.
+*/
+export const get_trip_by_code = async (trip_code) => {
+    try {
+        const db = await connect_to_db();
+        const sql = `
+            SELECT * FROM trips
+            WHERE code = $1;
+        `;
+        const result = await db.query(sql, [trip_code]);
+        return result.rows[0];
+    } catch (err) {
+        console.error("Failed to get trip by code", err.message);
+    }
+}
+
+/** get trip
  * @param {string} trip_id - The id of the trip.
  * @returns {Promise<import('pg').QueryResult>} - The result of the query.
 */
@@ -89,7 +107,7 @@ export const delete_trip = async (trip_id) => {
 
 //getting all trips of user
 export const getalltrips = async (clerk_id) => {
-    try{
+    try {
         const db = await connect_to_db();
         const sql = `
             select t.* from trips t
@@ -100,8 +118,25 @@ export const getalltrips = async (clerk_id) => {
         const result = await db.query(sql, [clerk_id]);
         return result.rows;
 
-    }catch(err){
+    } catch (err) {
         console.log(err);
         return err;
     }
 }
+
+export const join_trip = async (trip_id, user_id) => {
+    try {
+        const db = await connect_to_db();
+        const sql = `
+            INSERT INTO user_trips (trip_id, user_id)
+            VALUES ($1, $2)
+            RETURNING *;
+        `;
+        const result = await db.query(sql, [trip_id, user_id]);
+        return result.rows[0];
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+};
+

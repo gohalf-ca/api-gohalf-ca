@@ -13,9 +13,13 @@ if (parsed) {
 export default {
     clerk: {
         signing_secret: process.env.CLERK_SIGNING_SECRET,
-        secret_key: process.env.CLERK_SECRET_KEY
+        secret_key: process.env.CLERK_SECRET_KEY,
+        publishable_key: process.env.CLERK_PUBLISHABLE_KEY,
     },
     port: process.env.APP_PORT,
+    client: {
+        url: process.env.CLIENT_URL,
+    },
     db: {
         url: process.env.DATABASE_URL,
         user: process.env.APP_DATABASE_USERNAME,
