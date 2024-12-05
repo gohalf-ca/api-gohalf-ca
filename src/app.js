@@ -1,10 +1,16 @@
+import 'dotenv/config';
+
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import routes from './server/routes.js'
 import { clerk_webhook } from './server/handlers/webhook.js';
+import { clerkMiddleware } from '@clerk/express';
 
 const app = express();
+
+//  INFO: Clerk middleware
+app.use(clerkMiddleware());
 
 //  INFO: cross-origin resource sharing
 app.use(cors());

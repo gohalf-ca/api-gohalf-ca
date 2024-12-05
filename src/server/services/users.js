@@ -1,4 +1,3 @@
-//import { reset } from 'nodemon';
 import { connect_to_db } from '../../database/database.js';
 
 /** create user
@@ -11,12 +10,17 @@ export const create_user = async (clerk_id, email) => {
     try {
         const sql = `
             INSERT INTO users (clerk_id, email)
-            VALUES ($1, $2);
+            VALUES ($1, $2)
+            ON CONFLICT (email) DO UPDATE SET clerk_id = $1
+            RETURNING *;
         `;
-        void db.query(sql, [clerk_id, email]);
+        const result = await db.query(sql, [clerk_id, email]);
+        if (result.rows.length === 0) {
+            throw new Error("Failed to create user");
+        }
+        return result.rows[0];
     } catch (err) {
-        console.error("Failed to create user", err.message);
-        return null;
+        console.error(err.message);
     }
 }
 
@@ -24,10 +28,10 @@ export const create_user = async (clerk_id, email) => {
 export const get_user_id = async (req, res) => {
     const db = await connect_to_db();
 
-    
 
-    try{
-        const {clerk_id} = req.params;
+
+    try {
+        const { clerk_id } = req.params;
 
         const sql = `
         SELECT user_id 
@@ -38,10 +42,10 @@ export const get_user_id = async (req, res) => {
 
         //filtering to just get id number
         const userIDNum = userID.rows[0].user_id;
-        res.status(201).json({ID: userIDNum});
+        res.status(201).json({ ID: userIDNum });
 
-    }catch(err){
+    } catch (err) {
         console.log(err)
-        res.status(500).json({error: "Issue occured"})
+        res.status(500).json({ error: "Issue occured" })
     }
 }
