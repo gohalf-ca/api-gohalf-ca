@@ -124,6 +124,11 @@ export const getalltrips = async (clerk_id) => {
     }
 }
 
+/** join a trip by code
+ * @param {string} trip_id - The id of the trip.
+ * @param {string} user_id - The id of the user.
+ * @returns {Promise<import('pg').QueryResult>.rows} - The result of the query.
+*/
 export const join_trip = async (trip_id, user_id) => {
     try {
         const db = await connect_to_db();
