@@ -56,8 +56,10 @@ export const create_expense = async (create_expense_command) => {
                 create_expense_command.amount / group_members.rows.length,
             ]);
         });
-        await Promise.all(subexpenses_promises);
+        const subexpenses = await Promise.all(subexpenses_promises);
+        console.log("subexpenses", subexpenses);
 
+        // commit the transaction
         await db.query('COMMIT');
     } catch (err) {
         await db.query('ROLLBACK');
