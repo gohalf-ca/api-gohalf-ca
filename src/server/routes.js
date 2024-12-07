@@ -18,5 +18,8 @@ routes.route('/alltrips/:clerk_id').get(getalltrips);
 // INFO: Get user ID
 routes.get('/getuserid/:clerk_id', get_user_id);
 
+// expenses
+routes.route('/expenses').post(requireAuth(), create_expense);
+
 
 export default routes;
