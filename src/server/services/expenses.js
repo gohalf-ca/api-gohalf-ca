@@ -41,7 +41,7 @@ export const createExpense = async (createExpenseCommand) => {
         // Fetch group members, excluding the expense creator
         const getGroupMembersSql = `
             SELECT user_id
-            FROM trip_members
+            FROM user_trips
             WHERE trip_id = $1 AND user_id != $2;
         `;
         const groupMembersResult = await db.query(getGroupMembersSql, [
@@ -94,8 +94,27 @@ export const createExpense = async (createExpenseCommand) => {
         throw error;
     } finally {
         // Ensure database connection is closed
-        if (db.end) {
-            await db.end();
-        }
+        // if (db.end) {
+        //     await db.end();
+        // }
     }
 };
+
+//Get all expenses for a certain trip
+export const getAllExpenses = async (trip_id) => {
+    try{
+        const db = await connect_to_db();   //db connection
+
+        //sql insert command
+        const sql = `
+        SELECT * FROM EXPENSES
+        WHERE trip_id = $1`
+
+
+        const result = await db.query(sql, [trip_id])
+        return result.rows;
+    }catch (err){
+        console.log("Error Occured during geting all expenses of a trip, error is: \n" + err)
+        return err;
+    }
+}
