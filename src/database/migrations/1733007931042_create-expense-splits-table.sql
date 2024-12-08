@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS expense_splits (
 );
 
 -- Down Migration
-DROP TABLE IF EXISTS subexpenses;
+DROP TABLE IF EXISTS expense_splits;
