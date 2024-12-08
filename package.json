@@ -7,7 +7,7 @@
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.js",
-    "migrate": "node-pg-migrate -s 'public' -j 'sql' -m 'src/database/migrations'",
+    "migrate": "node-pg-migrate -s public -j sql -m src/database/migrations",
     "compose": "docker compose up -d"
   },
   "keywords": [],
