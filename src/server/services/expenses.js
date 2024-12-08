@@ -114,7 +114,30 @@ export const getAllExpenses = async (trip_id) => {
         const result = await db.query(sql, [trip_id])
         return result.rows;
     }catch (err){
-        console.log("Error Occured during geting all expenses of a trip, error is: \n" + err)
+        return err;
+    }
+}
+
+
+
+export const deleteExpense = async (expense_id) => {
+    try {
+
+        //  Deletes all expense splits first to aviod parent key issues
+        const db = await connect_to_db();
+        const sql = `
+            DELETE FROM expense_splits
+            WHERE expense_id = $1`;
+
+        await db.query(sql, [expense_id]);
+
+        
+        //  Deletes the expense itself
+        const sql2 = `
+        DELETE FROM expenses 
+        WHERE expense_id = $1`;
+        await db.query(sql2, [expense_id]);
+    } catch (error) {
         return err;
     }
 }

@@ -37,10 +37,12 @@ export const get_trip_expenses= async (req, res) => {
 
 
 export const delete_expense = async (req, res) => {
-
+    const expenseID = req.params.expense_id
 
     try{
-
+        console.log("awddaw")
+        await expense_service.deleteExpense(expenseID)
+        res.status(201).json({ message: 'Expense deleted' });
     }catch (err){
         res.status(500).json({ error: 'Failed to get all expenses', message: err.message })
     }
