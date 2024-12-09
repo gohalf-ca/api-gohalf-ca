@@ -23,7 +23,6 @@ export const register = async (req, res) => {
         `;
         const row = await db.query(sql, [name, email, username, hashed_password]);
 
-        console.log("User created", row);
         res.json({ row });
 
     } catch (err) {

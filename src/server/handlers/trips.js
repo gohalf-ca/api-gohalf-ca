@@ -78,7 +78,7 @@ export const delete_trip = async (req, res) => {
 export const getalltrips = async (req, res) => {
     try {
         const { clerk_id } = req.params;
-        const responseData = await trip_service.getalltrips(clerk_id);
+        const responseData = await trip_service.get_all_trips(clerk_id);
         res.status(201).json({ response: true, data: responseData });
     } catch (err) {
         res.send(500).json({ error: 'Failed to delete trip', message: err.message })
@@ -92,7 +92,7 @@ export const getalltrips = async (req, res) => {
  * @returns {void} - No return value.
  */
 export const join_trip = async (req, res) => {
-    const user_id = req.auth.sessionClaims.user_external_id;
+    const user_id = req.auth.sessionClaims.user_external_id ?? req.body.user_id;
     const { code } = req.params;
     if (!code) {
         res.status(400).json({ error: 'Code is required' });
