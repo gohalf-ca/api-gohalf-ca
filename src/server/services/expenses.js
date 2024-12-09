@@ -13,7 +13,6 @@ import { connect_to_db } from '../../database/database.js';
  */
 export const createExpense = async (createExpenseCommand) => {
     const db = await connect_to_db();
-    console.log("createExpenseCommand", createExpenseCommand);
 
     try {
         // Start a database transaction
@@ -38,52 +37,35 @@ export const createExpense = async (createExpenseCommand) => {
         }
 
         const createdExpense = expenseResult.rows[0];
-        console.log("createdExpense", createdExpense);
 
         // Fetch group members, excluding the expense creator
-        const getGroupMembersSql = `
+        const get_trip_participants_sql = `
             SELECT user_id
             FROM user_trips
-            WHERE trip_id = $1 AND user_id != $2;
+            WHERE trip_id = $1;
         `;
-        const groupMembersResult = await db.query(getGroupMembersSql, [
+        const get_trip_participants_results = await db.query(get_trip_participants_sql, [
             createExpenseCommand.trip_id,
-            createExpenseCommand.user_id,
         ]);
-        console.log("groupMembersResult", groupMembersResult.rows);
 
-        // Calculate subexpense amount (equal split among members)
-        const memberCount = groupMembersResult.rows.length;
-        const splitAmount = Math.floor(createExpenseCommand.amount / (memberCount + 1));
-
-        // Create subexpenses for each group member
-        const createExpenseSplitsSql = `
-            INSERT INTO expense_splits (expense_id, user_id, amount)
-            VALUES ($1, $2, $3);
+        // Create trip participant as expense_participant
+        const create_expense_participants_sql = `
+            INSERT INTO expense_participants (expense_id, user_id, amount, is_paid)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *;
         `;
 
-        const subexpensePromises = groupMembersResult.rows.map(member =>
-            db.query(createExpenseSplitsSql, [
+        const expense_amount_split = Math.floor(createExpenseCommand.amount / get_trip_participants_results.rows.length);
+        const expense_participants = [];
+        for (const p of get_trip_participants_results.rows) {
+            const result = await db.query(create_expense_participants_sql, [
                 createdExpense.expense_id,
-                member.user_id,
-                splitAmount
-            ])
-        );
-
-        // Add the creator's subexpense (if there are other members)
-        // if (memberCount > 0) {
-        //     const split = createExpenseCommand.amount - (splitAmount * memberCount);
-        //     subexpensePromises.push(
-        //         db.query(createExpenseSplitsSql, [
-        //             createdExpense.expense_id,
-        //             createExpenseCommand.user_id,
-        //             split
-        //         ])
-        //     );
-        // }
-
-        // Execute all subexpense insertions
-        await Promise.all(subexpensePromises);
+                p.user_id,
+                expense_amount_split,
+                p.user_id === createExpenseCommand.user_id
+            ]);
+            expense_participants.push(result.rows[0]);
+        }
 
         // Commit the transaction
         await db.query('COMMIT');
