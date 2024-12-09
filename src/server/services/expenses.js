@@ -83,18 +83,48 @@ export const createExpense = async (createExpenseCommand) => {
 
 //Get all expenses for a certain trip
 export const getAllExpenses = async (trip_id) => {
+    const db = await connect_to_db();   //db connection
     try {
-        const db = await connect_to_db();   //db connection
+        await db.query('BEGIN');  //start transaction
 
         //sql insert command
-        const sql = `
-        SELECT * FROM expenses
+        const expenses_sql = `
+        SELECT e.expense_id,
+            e.trip_id,
+            e.created_by,
+            e.name,
+            e.amount,
+            e.description,
+            e.created_at,
+            u.email,
+            u.clerk_id
+        FROM expenses e
+        JOIN users u
+            ON e.created_by = u.user_id
         WHERE trip_id = $1`
 
-        const result = await db.query(sql, [trip_id])
-        return result.rows;
+        const expenses_results = await db.query(expenses_sql, [trip_id]);
+        for (const expense of expenses_results.rows) {
+            const expense_participants_sql = `
+            SELECT ep.user_id,
+                ep.amount,
+                ep.is_paid,
+                u.email,
+                u.clerk_id
+            FROM expense_participants ep
+            JOIN users u
+                ON ep.user_id = u.user_id
+            WHERE expense_id = $1`
+
+            const expense_participants_results = await db.query(expense_participants_sql, [expense.expense_id]);
+            expense.participants = expense_participants_results.rows;
+        }
+
+        await db.query('COMMIT');   //commit transaction
+        return expenses_results.rows;
     } catch (err) {
-        return err;
+        await db.query('ROLLBACK'); //rollback transaction
+        throw err;
     }
 }
 

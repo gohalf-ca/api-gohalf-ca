@@ -1,3 +1,4 @@
+import { clerkClient } from '@clerk/express';
 import * as expense_service from '../services/expenses.js'
 
 /** create expense
@@ -17,6 +18,7 @@ export const create_expense = async (req, res) => {
             description: req.body.description,
             amount: typeof req.body.amount === 'string' ? parseInt(req.body.amount) : req.body.amount
         };
+
         let result = await expense_service.createExpense(create_expense_command);
         res.status(201).json({ message: 'Expense created', trip_id: result });
     } catch (err) {
@@ -25,16 +27,26 @@ export const create_expense = async (req, res) => {
 }
 
 
-export const get_trip_expenses = async (req, res) => {
+export const get_expenses = async (req, res) => {
     const tripID = req.params.trip_id;
-
     try {
-        const result = await expense_service.getAllExpenses(tripID);    //Call function to get object with all expenses
-        res.status(201).json({ response: true, data: result })
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to get all expenses', message: err.message })
-    }
+        let results = await expense_service.getAllExpenses(tripID);    //Call function to get object with all expenses
+        for (const expense of results) {
+            for (const participant of expense.participants) {
+                const clerk_participant = await clerkClient.users.getUser(participant.clerk_id);
+                participant.name = clerk_participant.fullName
 
+                if (expense.created_by === participant.user_id) {
+                    expense.created_by = { name: clerk_participant.firstName };
+                }
+            }
+            delete expense.clerk_id;
+            delete expense.email;
+        }
+        res.status(201).json({ results, count: results.length });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to get expenses', message: err.message });
+    }
 }
 
 
@@ -42,7 +54,6 @@ export const delete_expense = async (req, res) => {
     const expenseID = req.params.expense_id
 
     try {
-        console.log("awddaw")
         await expense_service.deleteExpense(expenseID)
         res.status(201).json({ message: 'Expense deleted' });
     } catch (err) {
