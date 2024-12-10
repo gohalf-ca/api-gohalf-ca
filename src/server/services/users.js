@@ -24,6 +24,28 @@ export const create_user = async (clerk_id, email) => {
     }
 }
 
+/** get user id
+ * @param {string} clerk_id - The clerk_id of the user.
+ * @returns {Promise<import('pg').QueryResult>} - The result of the query.
+ * */
+export const get_user_by_clerk_id = async (clerk_id) => {
+    const db = await connect_to_db();
+    try {
+        const sql = `
+            SELECT user_id
+            FROM users
+            WHERE clerk_id = $1;
+        `;
+        const result = await db.query(sql, [clerk_id]);
+        if (result.rows.length === 0) {
+            throw new Error("User not found");
+        }
+        return result.rows[0];
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
 
 export const get_user_id = async (req, res) => {
     const db = await connect_to_db();

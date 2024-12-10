@@ -1,5 +1,6 @@
 import { clerkClient } from '@clerk/express';
 import * as expense_service from '../services/expenses.js'
+import * as user_service from '../services/users.js'
 
 /** create expense
  * @param {import('express').Request} req - The Express request object.
@@ -47,6 +48,20 @@ export const get_expenses = async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: 'Failed to get expenses', message: err.message });
     }
+};
+
+export const mark_expense_as_paid = async (req, res) => {
+    try {
+        const user = await user_service.get_user_by_clerk_id(req.auth?.sessionClaims?.user_id);
+        if (!user) {
+            res.status(401).json({ error: 'Unauthorized' });
+            return;
+        }
+        void expense_service.mark_expense_as_paid(req.params.expense_id, user.user_id);
+        res.status(201).json({ message: 'Expense marked as paid' });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to mark expense as paid', message: err.message });
+    }
 }
 
 
@@ -61,3 +76,5 @@ export const delete_expense = async (req, res) => {
     }
 
 }
+
+
