@@ -152,7 +152,7 @@ export const join_trip = async (trip_id, user_id) => {
             VALUES ($1, $2)
             RETURNING *;
         `;
-        const result = await db.query(sql, [trip_id, user_id]);
+        const result = await db.query(sql, [trip_id, user_id.ID]);
         return result.rows[0];
     } catch (err) {
         console.log(err);
