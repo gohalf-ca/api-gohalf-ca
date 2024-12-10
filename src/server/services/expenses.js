@@ -128,7 +128,25 @@ export const getAllExpenses = async (trip_id) => {
     }
 }
 
-
+/**
+ * marks an expense as paid
+ * @param {number} expense_id - The id of the expense to mark as paid
+ * @param {number} user_id - The id of the user marking the expense as paid
+ * @returns {void} The created expense
+ * @throws {Error} If expense creation fails
+ */
+export const mark_expense_as_paid = async (expense_id, user_id) => {
+    const db = await connect_to_db();
+    try {
+        const sql = `
+            UPDATE expense_participants
+            SET is_paid = true
+            WHERE expense_id = $1 AND user_id = $2`;
+        await db.query(sql, [expense_id, user_id]);
+    } catch (err) {
+        return err;
+    }
+}
 
 export const deleteExpense = async (expense_id) => {
     const db = await connect_to_db();
