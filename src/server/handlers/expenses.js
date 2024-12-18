@@ -38,7 +38,7 @@ export const get_expenses = async (req, res) => {
                 participant.name = clerk_participant.fullName
 
                 if (expense.created_by === participant.user_id) {
-                    expense.created_by = { name: clerk_participant.firstName };
+                    expense.created_by = { name: clerk_participant.firstName, Id: participant.user_id };
                 }
             }
             delete expense.clerk_id;
