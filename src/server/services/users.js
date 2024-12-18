@@ -71,3 +71,25 @@ export const get_user_id = async (req, res) => {
         res.status(500).json({ error: "Issue occured" })
     }
 }
+
+
+export const user_in_trip = async (userId, tripId) => {
+    try {
+        const db = await connect_to_db();
+
+        const sql = `
+        select * from user_trips
+        where trip_id = $1
+        and user_id = $2;
+        `
+        const result = await db.query(sql, [tripId, userId]);
+
+
+        if (result.rows[0] === undefined ){
+            throw new Error("User not in trip")
+        }
+
+    } catch (error) {
+        throw error;
+    }
+}
