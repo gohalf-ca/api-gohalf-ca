@@ -1,5 +1,6 @@
 import * as trip_service from '../services/trips.js'
 import { user_in_trip } from '../services/users.js';
+import { clerkClient } from '@clerk/express';
 
 /** create trip
  * @param {import('express').Request} req - The Express request object.
@@ -40,6 +41,14 @@ export const get_trip_by_code = async (req, res) => {
 export const get_trip_by_id = async (req, res) => {
     try {
         const trip = await trip_service.get_trip_by_id(req.params.trip_id);
+
+        for (let member of trip.members){
+            const clerk_participant = await clerkClient.users.getUser(member.clerk_id);
+            member.name = clerk_participant.firstName;
+
+            delete member.clerk_id;
+        }
+        
         res.status(201).json(trip);
     } catch (err) {
         res.status(500).json({ error: 'Failed to get trip', message: err.message });

@@ -67,8 +67,20 @@ export const get_trip_by_id = async (trip_id) => {
             SELECT * FROM trips
             WHERE trip_id = $1;
         `;
-        const result = await db.query(sql, [trip_id]);
-        return result.rows[0];
+        const tripData = await db.query(sql, [trip_id]);
+
+        //gets users id and  clerk id (to get their name)
+        const sql2 = `
+        select user_id, clerk_id from users 
+        join user_trips using(user_id)
+        where trip_id = $1;
+        `
+
+        const participents = await db.query(sql2, [trip_id]);
+        tripData.rows[0].members = participents.rows;
+
+
+        return tripData.rows[0];
     } catch (err) {
         console.error("Failed to get trip by id", err.message);
         return err;
