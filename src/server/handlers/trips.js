@@ -1,4 +1,5 @@
 import * as trip_service from '../services/trips.js'
+import { user_in_trip } from '../services/users.js';
 
 /** create trip
  * @param {import('express').Request} req - The Express request object.
@@ -109,4 +110,23 @@ export const join_trip = async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+}
+
+export const verify_user_in_trip = async (req, res, next) => {
+    let user_id;
+    let trip_id;
+
+    req.params.trip_id && (trip_id = req.params.trip_id)
+    req.body.trip_id && (trip_id = req.body.trip_id)
+
+    req.params.user_id && (user_id = req.params.user_id)
+    req.body.user_id && (user_id = req.body.user_id)
+
+    try { 
+        await user_in_trip(user_id, trip_id)
+        next();
+    } catch (error) {
+        res.status(500).json({error: error.message})
+    }
+
 }
